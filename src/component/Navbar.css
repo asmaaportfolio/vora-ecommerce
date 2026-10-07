@@ -1,0 +1,144 @@
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e1da;
+}
+
+.navbar__container {
+  max-width: 1280px;
+  min-height: 74px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__logo {
+  color: #1c1c1c;
+  font-family: "Poppins", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  transition: color 0.2s ease;
+}
+
+.navbar__logo:hover {
+  color: #b8895a;
+}
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navbar__links a {
+  position: relative;
+  color: #3d3d3d;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar__links a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 0;
+  height: 1px;
+  background: #b8895a;
+  transform: translateX(-50%);
+  transition: width 0.2s ease;
+}
+
+.navbar__links a:hover {
+  color: #1c1c1c;
+}
+
+.navbar__links a:hover::after {
+  width: 100%;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar__actions a,
+.navbar__actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #3d3d3d;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.navbar__actions a:hover,
+.navbar__actions button:hover {
+  color: #b8895a;
+  transform: translateY(-1px);
+}
+
+.navbar__menu {
+  display: none;
+}
+
+/* Tablet */
+
+@media (max-width: 850px) {
+  .navbar__links {
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+    padding: 26px 28px;
+    background: #ffffff;
+    border-bottom: 1px solid #e6e1da;
+    box-shadow: 0 12px 30px rgba(28, 28, 28, 0.06);
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .navbar__links.is-open {
+    display: flex;
+  }
+
+  .navbar__menu {
+    display: flex;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .navbar__container {
+    min-height: 68px;
+    padding: 0 18px;
+  }
+
+  .navbar__logo {
+    font-size: 23px;
+  }
+
+  .navbar__actions {
+    gap: 13px;
+  }
+
+  .navbar__links {
+    top: 68px;
+    padding: 24px 18px;
+  }
+}
+
