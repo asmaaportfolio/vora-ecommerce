@@ -1,4 +1,6 @@
+
 /* eslint-disable no-unused-vars */
+import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
@@ -42,11 +44,16 @@ function ProductCard({ product }) {
   return (
     <article className="shop-product-card">
       <div className="shop-product-card__image">
-        <img src={product.thumbnail} alt={product.title} />
+        <Link
+          to={`/product/${product.id}`}
+          className="shop-product-card__image-link"
+        >
+          <img src={product.thumbnail} alt={product.title} />
 
-        {hasDiscount && (
-          <span className="shop-product-card__badge">SALE</span>
-        )}
+          {hasDiscount && (
+            <span className="shop-product-card__badge">SALE</span>
+          )}
+        </Link>
 
         <button
           type="button"
@@ -65,24 +72,29 @@ function ProductCard({ product }) {
       </div>
 
       <div className="shop-product-card__content">
-        <span className="shop-product-card__category">
-          {formatCategory(product.category)}
-        </span>
+        <Link
+          to={`/product/${product.id}`}
+          className="shop-product-card__info"
+        >
+          <span className="shop-product-card__category">
+            {formatCategory(product.category)}
+          </span>
 
-        <h3>{product.title}</h3>
+          <h3>{product.title}</h3>
 
-        <div className="shop-product-card__rating">
-          <Star size={14} fill="currentColor" />
-          <span>{product.rating.toFixed(1)}</span>
-        </div>
+          <div className="shop-product-card__rating">
+            <Star size={14} fill="currentColor" />
+            <span>{product.rating.toFixed(1)}</span>
+          </div>
 
-        <div className="shop-product-card__price">
-          <strong>${product.price.toFixed(2)}</strong>
+          <div className="shop-product-card__price">
+            <strong>${product.price.toFixed(2)}</strong>
 
-          {oldPrice && (
-            <del>${oldPrice.toFixed(2)}</del>
-          )}
-        </div>
+            {oldPrice && (
+              <del>${oldPrice.toFixed(2)}</del>
+            )}
+          </div>
+        </Link>
 
         <button
           type="button"
@@ -574,3 +586,4 @@ function Shop() {
 }
 
 export default Shop;
+
