@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -8,42 +8,99 @@ import {
   ShoppingBag,
   Star,
   Truck,
+  MessageSquareText,
+  ShieldCheck,
 } from "lucide-react";
 import { getProductById } from "../services/productsApi";
+import { useCart } from "../context/CartContext.jsx";
 import "./ProductDetails.css";
 
 function ProductDetails() {
   const { id } = useParams();
 
+  const {
+    cart,
+    wishlist,
+    addToCart,
+    toggleWishlist,
+    isInWishlist,
+  } = useCart();
+
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchProduct() {
-      try {
-        setLoading(true);
-        setError("");
+    let cancelled = false;
 
-        const data = await getProductById(id);
+    async function fetchProduct() {
+      setLoading(true);
+      setError("");
+      setProduct(null);
+      setQuantity(1);
+
+      try {
+        let data;
+
+        if (/^\d+$/.test(id)) {
+          data = await getProductById(id);
+        } else {
+          const savedProduct = [...cart, ...wishlist].find(
+            (item) => String(item.id) === id
+          );
+
+          if (!savedProduct) {
+            throw new Error("Product not found");
+          }
+
+          data = {
+            ...savedProduct,
+            title: savedProduct.title || savedProduct.name,
+            thumbnail:
+              savedProduct.thumbnail || savedProduct.image || "",
+            images: [
+              savedProduct.thumbnail || savedProduct.image,
+            ].filter(Boolean),
+            rating: Number(savedProduct.rating) || 0,
+            stock: savedProduct.stock ?? 99,
+            description:
+              savedProduct.description ||
+              "Discover this product from the VORA collection.",
+            reviews: [],
+          };
+        }
+
+        if (cancelled) return;
 
         setProduct(data);
-        setSelectedImage(data.thumbnail);
-      } catch (error) {
+        setSelectedImage(
+          data.thumbnail || data.images?.[0] || ""
+        );
+      } catch {
+        if (cancelled) return;
+
         setError("Unable to load this product.");
+        setProduct(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     fetchProduct();
-  }, [id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, cart, wishlist]);
+
+  const liked = product ? isInWishlist(product.id) : false;
 
   const increaseQuantity = () => {
-    if (quantity < product.stock) {
+    if (product && quantity < product.stock) {
       setQuantity((value) => value + 1);
     }
   };
@@ -71,6 +128,7 @@ function ProductDetails() {
         <div className="product-details-state product-details-state--error">
           <h2>Product not found</h2>
           <p>{error || "This product is unavailable."}</p>
+          <Link to="/shop">Back to Shop</Link>
         </div>
       </main>
     );
@@ -82,22 +140,39 @@ function ProductDetails() {
     ? product.price / (1 - product.discountPercentage / 100)
     : null;
 
+  const reviews = Array.isArray(product.reviews)
+    ? product.reviews
+    : [];
+
+  const reviewCount = reviews.length;
+
+  const reviewAverage = reviewCount
+    ? reviews.reduce(
+        (total, review) => total + (Number(review.rating) || 0),
+        0
+      ) / reviewCount
+    : 0;
+
+  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => ({
+    rating,
+    count: reviews.filter(
+      (review) => Math.round(Number(review.rating) || 0) === rating
+    ).length,
+  }));
+
   return (
     <main className="product-details-page">
       <div className="product-details-container">
-        <nav className="product-details-breadcrumb">
+        <nav
+          className="product-details-breadcrumb"
+          aria-label="Breadcrumb"
+        >
           <Link to="/">Home</Link>
-
           <span>/</span>
-
           <Link to="/shop">Shop</Link>
-
           <span>/</span>
-
           <span>{product.category}</span>
-
           <span>/</span>
-
           <strong>{product.title}</strong>
         </nav>
 
@@ -121,9 +196,7 @@ function ProductDetails() {
 
             <div className="product-details-main-image">
               {hasDiscount && (
-                <span className="product-details-sale">
-                  SALE
-                </span>
+                <span className="product-details-sale">SALE</span>
               )}
 
               <img
@@ -147,7 +220,7 @@ function ProductDetails() {
                     key={star}
                     size={17}
                     fill={
-                      star <= Math.round(product.rating)
+                      star <= Math.round(Number(product.rating) || 0)
                         ? "currentColor"
                         : "none"
                     }
@@ -155,13 +228,13 @@ function ProductDetails() {
                 ))}
               </div>
 
-              <span>{product.rating.toFixed(1)}</span>
+              <span>{Number(product.rating || 0).toFixed(1)}</span>
             </div>
 
             <div className="product-details-price">
-              <strong>${product.price.toFixed(2)}</strong>
+              <strong>${Number(product.price).toFixed(2)}</strong>
 
-              {oldPrice && (
+              {oldPrice !== null && (
                 <del>${oldPrice.toFixed(2)}</del>
               )}
 
@@ -196,9 +269,7 @@ function ProductDetails() {
               {product.warrantyInformation && (
                 <div className="product-details-meta-row">
                   <span>Warranty</span>
-                  <strong>
-                    {product.warrantyInformation}
-                  </strong>
+                  <strong>{product.warrantyInformation}</strong>
                 </div>
               )}
             </div>
@@ -233,6 +304,7 @@ function ProductDetails() {
                   <button
                     type="button"
                     className="product-details-cart"
+                    onClick={() => addToCart(product, quantity)}
                   >
                     <ShoppingBag size={19} />
                     Add to Cart
@@ -243,12 +315,13 @@ function ProductDetails() {
                     className={`product-details-wishlist ${
                       liked ? "is-liked" : ""
                     }`}
-                    onClick={() => setLiked((value) => !value)}
+                    onClick={() => toggleWishlist(product)}
                     aria-label={
                       liked
                         ? "Remove from wishlist"
                         : "Add to wishlist"
                     }
+                    aria-pressed={liked}
                   >
                     <Heart
                       size={20}
@@ -262,9 +335,7 @@ function ProductDetails() {
 
                   <div>
                     <strong>Free shipping</strong>
-                    <span>
-                      Free shipping on this product
-                    </span>
+                    <span>Free shipping on this product</span>
                   </div>
                 </div>
               </>
@@ -275,6 +346,248 @@ function ProductDetails() {
             )}
           </div>
         </div>
+
+        <section
+          className="product-reviews"
+          aria-labelledby="product-reviews-title"
+        >
+          <div className="product-reviews-heading">
+            <div>
+              <span className="product-reviews-eyebrow">
+                THE CUSTOMER EXPERIENCE
+              </span>
+
+              <h2 id="product-reviews-title">
+                Reviews & Ratings
+              </h2>
+
+              <p>
+                Real feedback from customers about this product.
+              </p>
+            </div>
+
+            <div className="product-reviews-total">
+              <MessageSquareText size={18} />
+              <span>
+                {reviewCount} {reviewCount === 1 ? "Review" : "Reviews"}
+              </span>
+            </div>
+          </div>
+
+          {reviewCount > 0 ? (
+            <>
+              <div className="product-reviews-summary">
+                <div className="product-reviews-score">
+                  <span className="product-reviews-score-label">
+                    OVERALL RATING
+                  </span>
+
+                  <div className="product-reviews-average">
+                    {reviewAverage.toFixed(1)}
+                    <span>/5</span>
+                  </div>
+
+                  <div
+                    className="product-reviews-summary-stars"
+                    aria-label={`${reviewAverage.toFixed(1)} out of 5 stars`}
+                  >
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={17}
+                        fill={
+                          star <= Math.round(reviewAverage)
+                            ? "currentColor"
+                            : "none"
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  <p>
+                    Based on {reviewCount}{" "}
+                    {reviewCount === 1 ? "review" : "reviews"}
+                  </p>
+                </div>
+
+                <div className="product-reviews-breakdown">
+                  <h3>Rating breakdown</h3>
+
+                  {ratingDistribution.map((item) => {
+                    const percentage =
+                      (item.count / reviewCount) * 100;
+
+                    return (
+                      <div
+                        className="product-reviews-rating-row"
+                        key={item.rating}
+                      >
+                        <span className="product-reviews-rating-label">
+                          {item.rating}
+                          <Star size={13} fill="currentColor" />
+                        </span>
+
+                        <div
+                          className="product-reviews-rating-track"
+                          role="progressbar"
+                          aria-label={`${item.rating} star ratings`}
+                          aria-valuemin={0}
+                          aria-valuemax={reviewCount}
+                          aria-valuenow={item.count}
+                        >
+                          <span
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+
+                        <span className="product-reviews-rating-count">
+                          {item.count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="product-reviews-summary-note">
+                  <div className="product-reviews-note-icon">
+                    <ShieldCheck size={23} />
+                  </div>
+
+                  <h3>Customer feedback</h3>
+
+                  <p>
+                    Explore the ratings and comments shared with this
+                    product.
+                  </p>
+                </div>
+              </div>
+
+              <div className="product-reviews-list-heading">
+                <div>
+                  <span className="product-reviews-eyebrow">
+                    CUSTOMER VOICES
+                  </span>
+                  <h3>What customers say</h3>
+                </div>
+
+                <span className="product-reviews-list-count">
+                  {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+                </span>
+              </div>
+
+              <div className="product-reviews-list">
+                {reviews.map((review, index) => {
+                  const reviewerName =
+                    review.reviewerName || "Customer";
+
+                  const initials = reviewerName
+                    .trim()
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((part) => part.charAt(0))
+                    .join("")
+                    .toUpperCase();
+
+                  const reviewDate = review.date
+                    ? new Date(review.date)
+                    : null;
+
+                  const validDate =
+                    reviewDate &&
+                    !Number.isNaN(reviewDate.getTime());
+
+                  return (
+                    <article
+                      className="product-review-card"
+                      key={`${review.reviewerEmail || reviewerName}-${review.date || index}`}
+                    >
+                      <div className="product-review-top">
+                        <div
+                          className="product-review-avatar"
+                          aria-hidden="true"
+                        >
+                          {initials || "C"}
+                        </div>
+
+                        <div className="product-review-customer">
+                          <h4>{reviewerName}</h4>
+
+                          <div className="product-review-meta">
+                            {validDate && (
+                              <time dateTime={review.date}>
+                                {reviewDate.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </time>
+                            )}
+
+                            <span className="product-review-meta-dot">
+                              ·
+                            </span>
+
+                            <span>Customer review</span>
+                          </div>
+                        </div>
+
+                        <div
+                          className="product-review-rating-badge"
+                          aria-label={`${review.rating} out of 5 stars`}
+                        >
+                          <Star size={14} fill="currentColor" />
+                          <span>
+                            {Number(review.rating || 0).toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div
+                        className="product-review-stars"
+                        aria-hidden="true"
+                      >
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={15}
+                            fill={
+                              star <= Math.round(Number(review.rating) || 0)
+                                ? "currentColor"
+                                : "none"
+                            }
+                          />
+                        ))}
+                      </div>
+
+                      <p className="product-review-comment">
+                        {review.comment || "No comment provided."}
+                      </p>
+
+                      <div className="product-review-footer">
+                        <span>Product feedback</span>
+                        <span className="product-review-footer-mark">
+                          VORA
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <div className="product-reviews-empty">
+              <div className="product-reviews-empty-icon">
+                <MessageSquareText size={27} />
+              </div>
+
+              <h3>No reviews yet</h3>
+
+              <p>
+                There are no customer reviews for this product yet.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );

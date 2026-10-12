@@ -8,6 +8,8 @@
 }
 
 .navbar__container {
+  position: relative;
+  z-index: 2;
   max-width: 1280px;
   min-height: 74px;
   margin: 0 auto;
@@ -89,8 +91,193 @@
   transform: translateY(-1px);
 }
 
+.navbar__icon-link {
+  position: relative;
+}
+
+.navbar__badge {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  background: #b8895a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .navbar__menu {
   display: none;
+}
+
+/* Search */
+
+.navbar-search {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+}
+
+.navbar-search__container {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  margin: 12px auto 0;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #e6e1da;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(28, 28, 28, 0.12);
+}
+
+.navbar-search__input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid #e6e1da;
+  border-radius: 7px;
+  color: #777777;
+}
+
+.navbar-search__input:focus-within {
+  border-color: #b8895a;
+}
+
+.navbar-search__input input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #1c1c1c;
+  font: inherit;
+  font-size: 14px;
+}
+
+.navbar-search__input input::placeholder {
+  color: #999999;
+}
+
+.navbar-search__input button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: #777777;
+  cursor: pointer;
+}
+
+.navbar-search__results {
+  padding-top: 10px;
+}
+
+.navbar-search__message {
+  margin: 0;
+  padding: 18px 8px;
+  color: #777777;
+  font-size: 13px;
+  text-align: center;
+}
+
+.navbar-search__message--error {
+  color: #a33a32;
+}
+
+.navbar-search__result {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 8px;
+  border: 0;
+  border-bottom: 1px solid #f0ece7;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.navbar-search__result:last-of-type {
+  border-bottom: 0;
+}
+
+.navbar-search__result:hover {
+  background: #faf8f5;
+}
+
+.navbar-search__result img {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  object-fit: cover;
+  background: #f5f3ef;
+}
+
+.navbar-search__result-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.navbar-search__result-info strong {
+  overflow: hidden;
+  color: #1c1c1c;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-search__result-info small {
+  color: #777777;
+  font-size: 12px;
+}
+
+.navbar-search__result-price {
+  color: #1c1c1c;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.navbar-search__view-all {
+  display: block;
+  padding: 15px 8px 5px;
+  color: #9a7049;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.navbar-search__view-all:hover {
+  color: #1c1c1c;
+}
+
+.navbar-search__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(28, 28, 28, 0.18);
+  cursor: default;
 }
 
 /* Tablet */
@@ -118,6 +305,10 @@
   .navbar__menu {
     display: flex;
   }
+
+  .navbar-search__container {
+    width: calc(100% - 36px);
+  }
 }
 
 /* Mobile */
@@ -140,5 +331,34 @@
     top: 68px;
     padding: 24px 18px;
   }
-}
 
+  .navbar-search__container {
+    width: calc(100% - 24px);
+    margin-top: 8px;
+    padding: 12px;
+  }
+
+  .navbar-search__input {
+    gap: 8px;
+    padding: 11px;
+  }
+
+  .navbar-search__input input {
+    font-size: 12px;
+  }
+
+  .navbar-search__result {
+    gap: 10px;
+    padding: 10px 4px;
+  }
+
+  .navbar-search__result img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .navbar-search__result-info strong,
+  .navbar-search__result-price {
+    font-size: 11px;
+  }
+}

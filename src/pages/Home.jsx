@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -7,6 +8,7 @@ import {
   ShoppingBag,
   Star,
 } from "lucide-react";
+import { useCart } from "../context/CartContext.jsx";
 import "./Home.css";
 
 const categories = [
@@ -38,6 +40,7 @@ const categories = [
 
 const featuredProducts = [
   {
+    id: "home-featured-leather-bag",
     name: "Minimal Leather Bag",
     category: "Accessories",
     price: "$89.00",
@@ -47,17 +50,19 @@ const featuredProducts = [
     image:
       "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=85",
   },
-{
-  name: "Premium Headphones",
-  category: "Electronics",
-  price: "$129.00",
-  oldPrice: "$159.00",
-  rating: "4.9",
-  badge: "BEST SELLER",
-  image:
-    "https://images.unsplash.com/photo-1684703147716-014da6a31aa3?auto=format&fit=crop&w=800&q=85",
-},
   {
+    id: "home-featured-headphones",
+    name: "Premium Headphones",
+    category: "Electronics",
+    price: "$129.00",
+    oldPrice: "$159.00",
+    rating: "4.9",
+    badge: "BEST SELLER",
+    image:
+      "https://images.unsplash.com/photo-1684703147716-014da6a31aa3?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    id: "home-featured-sneakers",
     name: "Classic Sneakers",
     category: "Fashion",
     price: "$74.00",
@@ -68,6 +73,7 @@ const featuredProducts = [
       "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-featured-watch",
     name: "Everyday Watch",
     category: "Accessories",
     price: "$95.00",
@@ -81,6 +87,7 @@ const featuredProducts = [
 
 const newArrivals = [
   {
+    id: "home-new-sunglasses",
     name: "Modern Sunglasses",
     category: "Accessories",
     price: "$59.00",
@@ -90,6 +97,7 @@ const newArrivals = [
       "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-new-smart-watch",
     name: "Smart Watch Pro",
     category: "Electronics",
     price: "$199.00",
@@ -99,6 +107,7 @@ const newArrivals = [
       "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-new-beauty",
     name: "Beauty Essentials",
     category: "Beauty",
     price: "$45.00",
@@ -108,6 +117,7 @@ const newArrivals = [
       "https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-new-desk-lamp",
     name: "Minimal Desk Lamp",
     category: "Home & Living",
     price: "$68.00",
@@ -120,6 +130,7 @@ const newArrivals = [
 
 const bestSellers = [
   {
+    id: "home-best-wallet",
     name: "Classic Leather Wallet",
     category: "Accessories",
     price: "$49.00",
@@ -128,6 +139,7 @@ const bestSellers = [
       "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-best-earbuds",
     name: "Wireless Earbuds",
     category: "Electronics",
     price: "$89.00",
@@ -136,6 +148,7 @@ const bestSellers = [
       "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-best-hoodie",
     name: "Premium Hoodie",
     category: "Fashion",
     price: "$79.00",
@@ -144,6 +157,7 @@ const bestSellers = [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=85",
   },
   {
+    id: "home-best-vase",
     name: "Ceramic Vase",
     category: "Home & Living",
     price: "$39.00",
@@ -154,7 +168,31 @@ const bestSellers = [
 ];
 
 function ProductCard({ product }) {
-  const [liked, setLiked] = useState(false);
+  const {
+    addToCart,
+    toggleWishlist,
+    isInWishlist,
+  } = useCart();
+
+  const liked = isInWishlist(product.id);
+
+  const cartProduct = {
+    id: product.id,
+    title: product.name,
+    category: product.category.toLowerCase().replaceAll(" ", "-"),
+    price: Number(product.price.replace("$", "")),
+    thumbnail: product.image,
+    rating: Number(product.rating),
+    stock: 99,
+  };
+
+  function handleAddToCart() {
+    addToCart(cartProduct);
+  }
+
+  function handleWishlist() {
+    toggleWishlist(cartProduct);
+  }
 
   return (
     <article className="product-card">
@@ -166,14 +204,24 @@ function ProductCard({ product }) {
           className={`product-card__wishlist ${
             liked ? "is-liked" : ""
           }`}
-          onClick={() => setLiked((value) => !value)}
-          aria-label={`Add ${product.name} to wishlist`}
+          onClick={handleWishlist}
+          aria-label={
+            liked
+              ? `Remove ${product.name} from wishlist`
+              : `Add ${product.name} to wishlist`
+          }
+          aria-pressed={liked}
         >
-          <Heart size={18} fill={liked ? "currentColor" : "none"} />
+          <Heart
+            size={18}
+            fill={liked ? "currentColor" : "none"}
+          />
         </button>
 
         {product.badge && (
-          <span className="product-card__badge">{product.badge}</span>
+          <span className="product-card__badge">
+            {product.badge}
+          </span>
         )}
       </div>
 
@@ -192,10 +240,16 @@ function ProductCard({ product }) {
         <div className="product-card__price">
           <strong>{product.price}</strong>
 
-          {product.oldPrice && <del>{product.oldPrice}</del>}
+          {product.oldPrice && (
+            <del>{product.oldPrice}</del>
+          )}
         </div>
 
-        <button className="product-card__cart" type="button">
+        <button
+          className="product-card__cart"
+          type="button"
+          onClick={handleAddToCart}
+        >
           <ShoppingBag size={16} />
           Add to Cart
         </button>
@@ -221,7 +275,10 @@ function ProductSection({ label, title, products }) {
 
       <div className="products__grid">
         {products.map((product) => (
-          <ProductCard product={product} key={product.name} />
+          <ProductCard
+            product={product}
+            key={product.id}
+          />
         ))}
       </div>
     </section>
@@ -229,6 +286,29 @@ function ProductSection({ label, title, products }) {
 }
 
 function Home() {
+  const categoriesSliderRef = useRef(null);
+
+  const scrollCategories = (direction) => {
+    const slider = categoriesSliderRef.current;
+
+    if (!slider) return;
+
+    const card = slider.querySelector(".category-card");
+
+    if (!card) return;
+
+    const cardWidth = card.getBoundingClientRect().width;
+    const gap = 18;
+
+    slider.scrollBy({
+      left:
+        direction === "right"
+          ? cardWidth + gap
+          : -(cardWidth + gap),
+      behavior: "smooth",
+    });
+  };
+
   const handleSubscribe = (event) => {
     event.preventDefault();
   };
@@ -288,33 +368,64 @@ function Home() {
             <h2>Shop by Category</h2>
           </div>
 
-          <Link to="/categories" className="section__link">
-            View All
-            <ArrowRight size={17} />
-          </Link>
+          <div className="categories__controls">
+            <Link to="/categories" className="section__link">
+              View All
+              <ArrowRight size={17} />
+            </Link>
+
+            <button
+              type="button"
+              className="categories__arrow"
+              aria-label="Previous categories"
+              onClick={() => scrollCategories("left")}
+            >
+              <ArrowRight
+                size={18}
+                className="categories__arrow--left"
+              />
+            </button>
+
+            <button
+              type="button"
+              className="categories__arrow"
+              aria-label="Next categories"
+              onClick={() => scrollCategories("right")}
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
 
-        <div className="categories__grid">
-          {categories.map((category) => (
-            <Link
-              to="/categories"
-              className="category-card"
-              key={category.name}
-            >
-              <img src={category.image} alt={category.name} />
+        <div
+          className="categories__slider"
+          ref={categoriesSliderRef}
+        >
+          <div className="categories__grid">
+            {categories.map((category) => (
+              <Link
+                to="/categories"
+                className="category-card"
+                key={category.name}
+              >
+                <img
+                  src={category.image}
+                  alt={category.name}
+                />
 
-              <div className="category-card__overlay">
-                <div>
-                  <h3>{category.name}</h3>
-                  <p>{category.description}</p>
+                <div className="category-card__overlay">
+                  <div>
+                    <h3>{category.name}</h3>
+                    <p>{category.description}</p>
+                  </div>
+
+                  <span>
+                    <ArrowRight size={18} />
+                  </span>
                 </div>
-
-                <span>
-                  <ArrowRight size={18} />
-                </span>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -440,7 +551,10 @@ function Home() {
             and special drops.
           </p>
 
-          <form className="newsletter__form" onSubmit={handleSubscribe}>
+          <form
+            className="newsletter__form"
+            onSubmit={handleSubscribe}
+          >
             <div>
               <Mail size={18} />
 

@@ -1,5 +1,5 @@
 
-/* eslint-disable no-unused-vars */
+
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { getProducts } from "../services/productsApi";
+import { useCart } from "../context/CartContext.jsx";
 import "./Shop.css";
 
 const PRODUCTS_PER_PAGE = 12;
@@ -25,7 +26,7 @@ const priceRanges = [
   { label: "$500+", min: 500, max: Infinity },
 ];
 
-function formatCategory(category) {
+function formatCategory(category = "") {
   return category
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -33,13 +34,25 @@ function formatCategory(category) {
 }
 
 function ProductCard({ product }) {
-  const [liked, setLiked] = useState(false);
+  const { addToCart, toggleWishlist, isInWishlist } = useCart();
 
+  const liked = isInWishlist(product.id);
+  const outOfStock = product.stock <= 0;
   const hasDiscount = product.discountPercentage > 0;
 
   const oldPrice = hasDiscount
     ? product.price / (1 - product.discountPercentage / 100)
     : null;
+
+  function handleAddToCart() {
+    if (outOfStock) return;
+
+    addToCart(product);
+  }
+
+  function handleWishlist() {
+    toggleWishlist(product);
+  }
 
   return (
     <article className="shop-product-card">
@@ -51,7 +64,9 @@ function ProductCard({ product }) {
           <img src={product.thumbnail} alt={product.title} />
 
           {hasDiscount && (
-            <span className="shop-product-card__badge">SALE</span>
+            <span className="shop-product-card__badge">
+              SALE
+            </span>
           )}
         </Link>
 
@@ -60,14 +75,18 @@ function ProductCard({ product }) {
           className={`shop-product-card__wishlist ${
             liked ? "is-liked" : ""
           }`}
-          onClick={() => setLiked((value) => !value)}
+          onClick={handleWishlist}
           aria-label={
             liked
               ? `Remove ${product.title} from wishlist`
               : `Add ${product.title} to wishlist`
           }
+          aria-pressed={liked}
         >
-          <Heart size={18} fill={liked ? "currentColor" : "none"} />
+          <Heart
+            size={18}
+            fill={liked ? "currentColor" : "none"}
+          />
         </button>
       </div>
 
@@ -84,13 +103,13 @@ function ProductCard({ product }) {
 
           <div className="shop-product-card__rating">
             <Star size={14} fill="currentColor" />
-            <span>{product.rating.toFixed(1)}</span>
+            <span>{Number(product.rating || 0).toFixed(1)}</span>
           </div>
 
           <div className="shop-product-card__price">
-            <strong>${product.price.toFixed(2)}</strong>
+            <strong>${Number(product.price).toFixed(2)}</strong>
 
-            {oldPrice && (
+            {oldPrice !== null && (
               <del>${oldPrice.toFixed(2)}</del>
             )}
           </div>
@@ -99,9 +118,11 @@ function ProductCard({ product }) {
         <button
           type="button"
           className="shop-product-card__cart"
+          onClick={handleAddToCart}
+          disabled={outOfStock}
         >
           <ShoppingBag size={16} />
-          Add to Cart
+          {outOfStock ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </article>
@@ -119,7 +140,6 @@ function Shop() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
@@ -129,9 +149,8 @@ function Shop() {
         setError("");
 
         const data = await getProducts();
-
         setProducts(data);
-      } catch (error) {
+      } catch {
         setError("Something went wrong while loading products.");
       } finally {
         setLoading(false);
@@ -216,9 +235,14 @@ function Shop() {
     filteredProducts.length / PRODUCTS_PER_PAGE
   );
 
+  const safeCurrentPage = Math.min(
+    currentPage,
+    Math.max(totalPages, 1)
+  );
+
   const visibleProducts = filteredProducts.slice(
-    (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
+    (safeCurrentPage - 1) * PRODUCTS_PER_PAGE,
+    safeCurrentPage * PRODUCTS_PER_PAGE
   );
 
   const handleSearch = (event) => {
@@ -317,9 +341,7 @@ function Shop() {
                   type="radio"
                   name="category"
                   checked={category === "all"}
-                  onChange={() =>
-                    handleCategoryChange("all")
-                  }
+                  onChange={() => handleCategoryChange("all")}
                 />
                 <span>All Products</span>
               </label>
@@ -330,9 +352,7 @@ function Shop() {
                     type="radio"
                     name="category"
                     checked={category === item}
-                    onChange={() =>
-                      handleCategoryChange(item)
-                    }
+                    onChange={() => handleCategoryChange(item)}
                   />
                   <span>{formatCategory(item)}</span>
                 </label>
@@ -349,9 +369,7 @@ function Shop() {
                   type="radio"
                   name="price"
                   checked={priceRange === "all"}
-                  onChange={() =>
-                    handlePriceChange("all")
-                  }
+                  onChange={() => handlePriceChange("all")}
                 />
                 <span>All Prices</span>
               </label>
@@ -362,9 +380,7 @@ function Shop() {
                     type="radio"
                     name="price"
                     checked={priceRange === range.label}
-                    onChange={() =>
-                      handlePriceChange(range.label)
-                    }
+                    onChange={() => handlePriceChange(range.label)}
                   />
                   <span>{range.label}</span>
                 </label>
@@ -392,9 +408,7 @@ function Shop() {
                     type="radio"
                     name="rating"
                     checked={minRating === rating}
-                    onChange={() =>
-                      handleRatingChange(rating)
-                    }
+                    onChange={() => handleRatingChange(rating)}
                   />
 
                   <span className="rating-option">
@@ -428,9 +442,7 @@ function Shop() {
             </button>
 
             <div className="shop-toolbar__left">
-              <span>
-                {filteredProducts.length} products
-              </span>
+              <span>{filteredProducts.length} products</span>
             </div>
 
             <div className="shop-toolbar__right">
@@ -451,21 +463,11 @@ function Shop() {
                   onChange={handleSortChange}
                   aria-label="Sort products"
                 >
-                  <option value="featured">
-                    Featured
-                  </option>
-                  <option value="name">
-                    Name: A to Z
-                  </option>
-                  <option value="price-low">
-                    Price: Low to High
-                  </option>
-                  <option value="price-high">
-                    Price: High to Low
-                  </option>
-                  <option value="rating">
-                    Highest Rated
-                  </option>
+                  <option value="featured">Featured</option>
+                  <option value="name">Name: A to Z</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
                 </select>
 
                 <ChevronDown size={16} />
@@ -504,10 +506,7 @@ function Shop() {
                   Try changing your search or filters.
                 </p>
 
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                >
+                <button type="button" onClick={clearFilters}>
                   Clear Filters
                 </button>
               </div>
@@ -530,11 +529,9 @@ function Shop() {
                   <div className="shop-pagination">
                     <button
                       type="button"
-                      disabled={currentPage === 1}
+                      disabled={safeCurrentPage === 1}
                       onClick={() =>
-                        setCurrentPage(
-                          (page) => page - 1
-                        )
+                        setCurrentPage((page) => page - 1)
                       }
                       aria-label="Previous page"
                     >
@@ -549,13 +546,9 @@ function Shop() {
                         type="button"
                         key={page}
                         className={
-                          currentPage === page
-                            ? "is-active"
-                            : ""
+                          safeCurrentPage === page ? "is-active" : ""
                         }
-                        onClick={() =>
-                          setCurrentPage(page)
-                        }
+                        onClick={() => setCurrentPage(page)}
                       >
                         {page}
                       </button>
@@ -563,13 +556,9 @@ function Shop() {
 
                     <button
                       type="button"
-                      disabled={
-                        currentPage === totalPages
-                      }
+                      disabled={safeCurrentPage === totalPages}
                       onClick={() =>
-                        setCurrentPage(
-                          (page) => page + 1
-                        )
+                        setCurrentPage((page) => page + 1)
                       }
                       aria-label="Next page"
                     >
@@ -586,4 +575,3 @@ function Shop() {
 }
 
 export default Shop;
-

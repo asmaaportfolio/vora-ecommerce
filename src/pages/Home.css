@@ -1,3 +1,4 @@
+
 .home {
   overflow: hidden;
 }
@@ -209,23 +210,73 @@
   font-size: 13px;
 }
 
-/* Categories */
+/* Categories Slider */
 
 .categories {
   border-bottom: 1px solid var(--border);
 }
 
+.categories__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categories__arrow {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: var(--white);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.categories__arrow:hover {
+  color: var(--white);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.categories__arrow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.categories__arrow--left {
+  transform: rotate(180deg);
+}
+
+.categories__slider {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+
+.categories__slider::-webkit-scrollbar {
+  display: none;
+}
+
 .categories__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 18px;
 }
 
 .category-card {
   position: relative;
+  flex: 0 0 calc((100% - 36px) / 3);
+  min-width: 0;
   height: 370px;
   overflow: hidden;
   color: var(--white);
+  scroll-snap-align: start;
 }
 
 .category-card::after {
@@ -237,6 +288,7 @@
     rgba(0, 0, 0, 0.68),
     rgba(0, 0, 0, 0.03) 70%
   );
+  pointer-events: none;
 }
 
 .category-card img {
@@ -684,7 +736,10 @@
     padding-left: 45px;
   }
 
-  .categories__grid,
+  .category-card {
+    flex-basis: calc((100% - 18px) / 2);
+  }
+
   .products__grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -716,6 +771,15 @@
 
   .section__header h2 {
     font-size: 27px;
+  }
+
+  .categories__controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .categories__controls .section__link {
+    margin-right: auto;
   }
 
   .hero {
@@ -835,13 +899,13 @@
     display: none;
   }
 
-  .categories__grid,
-  .products__grid {
-    grid-template-columns: 1fr;
+  .category-card {
+    flex-basis: 85%;
+    height: 350px;
   }
 
-  .category-card {
-    height: 390px;
+  .products__grid {
+    grid-template-columns: 1fr;
   }
 
   .product-card__image {
