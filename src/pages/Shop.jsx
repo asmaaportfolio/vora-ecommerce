@@ -1,5 +1,4 @@
 
-
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -299,7 +298,13 @@ function Shop() {
           </p>
 
           <span className="shop-header__breadcrumb">
-            Home / Shop
+            <Link
+              to="/"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Home
+            </Link>
+            {" / Shop"}
           </span>
         </div>
       </section>

@@ -33,7 +33,7 @@ function Navbar() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!searchOpen) return;
+    if (!searchOpen || products.length > 0) return;
 
     let cancelled = false;
 
@@ -63,7 +63,7 @@ function Navbar() {
     return () => {
       cancelled = true;
     };
-  }, [searchOpen]);
+  }, [searchOpen, products.length]);
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -73,6 +73,11 @@ function Navbar() {
     setSearchOpen(false);
     setSearchTerm("");
     setError("");
+  };
+
+  const closeOverlays = () => {
+    closeMenu();
+    closeSearch();
   };
 
   const searchResults = searchTerm.trim()
@@ -86,37 +91,36 @@ function Navbar() {
     : [];
 
   const openProduct = (productId) => {
-    closeSearch();
-    closeMenu();
+    closeOverlays();
     navigate(`/product/${productId}`);
   };
 
   return (
     <header className="navbar">
       <nav className="navbar__container">
-        <Link to="/" className="navbar__logo" onClick={closeMenu}>
+        <Link to="/" className="navbar__logo" onClick={closeOverlays}>
           VORA
         </Link>
 
         <div className={`navbar__links ${menuOpen ? "is-open" : ""}`}>
-          <Link to="/" onClick={closeMenu}>
+          <Link to="/" onClick={closeOverlays}>
             Home
           </Link>
 
-          <Link to="/shop" onClick={closeMenu}>
+          <Link to="/shop" onClick={closeOverlays}>
             Shop
           </Link>
 
-          <Link to="/categories" onClick={closeMenu}>
-            Categories
-          </Link>
-
-          <Link to="/new-arrivals" onClick={closeMenu}>
+          <Link to="/new-arrivals" onClick={closeOverlays}>
             New Arrivals
           </Link>
 
-          <Link to="/offers" onClick={closeMenu}>
-            Offers
+          <Link to="/about" onClick={closeOverlays}>
+            About
+          </Link>
+
+          <Link to="/contact" onClick={closeOverlays}>
+            Contact
           </Link>
         </div>
 
@@ -137,7 +141,7 @@ function Navbar() {
             to="/wishlist"
             aria-label={`Wishlist, ${wishlist.length} items`}
             className="navbar__icon-link"
-            onClick={closeSearch}
+            onClick={closeOverlays}
           >
             <Heart size={20} />
 
@@ -152,7 +156,7 @@ function Navbar() {
             to="/cart"
             aria-label={`Shopping Cart, ${cartCount} items`}
             className="navbar__icon-link"
-            onClick={closeSearch}
+            onClick={closeOverlays}
           >
             <ShoppingBag size={20} />
 
@@ -166,7 +170,7 @@ function Navbar() {
           <Link
             to="/account"
             aria-label="Account"
-            onClick={closeSearch}
+            onClick={closeOverlays}
           >
             <User size={20} />
           </Link>
@@ -270,9 +274,9 @@ function Navbar() {
                 searchTerm.trim() &&
                 searchResults.length > 0 && (
                   <Link
-                    to={`/shop`}
+                    to="/shop"
                     className="navbar-search__view-all"
-                    onClick={closeSearch}
+                    onClick={closeOverlays}
                   >
                     View all products in Shop
                   </Link>
