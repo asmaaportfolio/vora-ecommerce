@@ -11,6 +11,9 @@ import {
   MessageSquareText,
   ShieldCheck,
 } from "lucide-react";
+
+import { getNewArrivalById } from "../services/newArrivalsApi";
+
 import { getProductById } from "../services/productsApi";
 import { useCart } from "../context/CartContext.jsx";
 import "./ProductDetails.css";
@@ -42,35 +45,36 @@ function ProductDetails() {
       setQuantity(1);
 
       try {
-        let data;
+       let data;
 
-        if (/^\d+$/.test(id)) {
-          data = await getProductById(id);
-        } else {
-          const savedProduct = [...cart, ...wishlist].find(
-            (item) => String(item.id) === id
-          );
+if (/^\d+$/.test(id)) {
+  data = await getProductById(id);
+} else if (/^new-\d+$/.test(id)) {
+  data = await getNewArrivalById(id);
+} else {
+  const savedProduct = [...cart, ...wishlist].find(
+    (item) => String(item.id) === id
+  );
 
-          if (!savedProduct) {
-            throw new Error("Product not found");
-          }
+  if (!savedProduct) {
+    throw new Error("Product not found");
+  }
 
-          data = {
-            ...savedProduct,
-            title: savedProduct.title || savedProduct.name,
-            thumbnail:
-              savedProduct.thumbnail || savedProduct.image || "",
-            images: [
-              savedProduct.thumbnail || savedProduct.image,
-            ].filter(Boolean),
-            rating: Number(savedProduct.rating) || 0,
-            stock: savedProduct.stock ?? 99,
-            description:
-              savedProduct.description ||
-              "Discover this product from the VORA collection.",
-            reviews: [],
-          };
-        }
+  data = {
+    ...savedProduct,
+    title: savedProduct.title || savedProduct.name,
+    thumbnail: savedProduct.thumbnail || savedProduct.image || "",
+    images: [
+      savedProduct.thumbnail || savedProduct.image,
+    ].filter(Boolean),
+    rating: Number(savedProduct.rating) || 0,
+    stock: savedProduct.stock ?? 99,
+    description:
+      savedProduct.description ||
+      "Discover this product from the VORA collection.",
+    reviews: [],
+  };
+}
 
         if (cancelled) return;
 

@@ -349,7 +349,7 @@ function Home() {
               <ArrowRight size={18} />
             </Link>
 
-            <Link to="/categories" className="hero__secondary">
+            <Link to="/shop" className="hero__secondary">
               Explore Categories
             </Link>
           </div>
@@ -369,7 +369,7 @@ function Home() {
           </div>
 
           <div className="categories__controls">
-            <Link to="/categories" className="section__link">
+            <Link to="/shop" className="section__link">
               View All
               <ArrowRight size={17} />
             </Link>
@@ -404,7 +404,7 @@ function Home() {
           <div className="categories__grid">
             {categories.map((category) => (
               <Link
-                to="/categories"
+                to="/shop"
                 className="category-card"
                 key={category.name}
               >
@@ -450,8 +450,8 @@ function Home() {
             limited time.
           </p>
 
-          <Link to="/offers" className="promo__button">
-            Shop Offers
+          <Link to="/new-arrivals" className="promo__button">
+            New Collection
             <ArrowRight size={18} />
           </Link>
         </div>

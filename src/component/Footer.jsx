@@ -1,10 +1,6 @@
-import { ArrowUp } from "lucide-react";
-import {
-  FaInstagram,
-  FaFacebookF,
-  FaYoutube,
-  FaXTwitter,
-} from "react-icons/fa6";
+
+import { ArrowRight, ArrowUp } from "lucide-react";
+import { Link } from "react-router-dom";
 import "./Footer.css";
 
 function Footer() {
@@ -19,68 +15,54 @@ function Footer() {
     <footer className="footer">
       <div className="footer__main">
         <div className="footer__brand">
-          <h2>VORA</h2>
+          <Link to="/" className="footer__logo">
+            VORA<span>.</span>
+          </Link>
 
           <p>
-            Everything you need, all in one place.
+            A little bit of everything.
             <br />
-            Discover products made for everyday life.
+            Everything for your everyday.
           </p>
 
-          <div className="footer__socials">
-            <a href="#" aria-label="Instagram">
-              <FaInstagram />
-            </a>
+          <Link to="/shop" className="footer__discover">
+            Discover VORA
+            <ArrowRight size={16} />
+          </Link>
+        </div>
 
-            <a href="#" aria-label="Facebook">
-              <FaFacebookF />
-            </a>
+        <div className="footer__links">
+          <div className="footer__column">
+            <span className="footer__heading">EXPLORE</span>
 
-            <a href="#" aria-label="YouTube">
-              <FaYoutube />
-            </a>
+            <Link to="/shop">Shop All</Link>
+            <Link to="/new-arrivals">New Arrivals</Link>
+            <Link to="/about">About VORA</Link>
+          </div>
 
-            <a href="#" aria-label="X">
-              <FaXTwitter />
-            </a>
+          <div className="footer__column">
+            <span className="footer__heading">GET IN TOUCH</span>
+
+            <Link to="/contact">Contact Us</Link>
           </div>
         </div>
 
-        <div className="footer__column">
-          <h3>Shop</h3>
+        <div className="footer__message">
+          <span>THE VORA EXPERIENCE</span>
 
-          <a href="#">All Products</a>
-          <a href="#">New Arrivals</a>
-          <a href="#">Best Sellers</a>
-          <a href="#">Offers</a>
-        </div>
-
-        <div className="footer__column">
-          <h3>Categories</h3>
-
-          <a href="#">Fashion</a>
-          <a href="#">Electronics</a>
-          <a href="#">Beauty</a>
-          <a href="#">Home & Living</a>
-        </div>
-
-        <div className="footer__column">
-          <h3>Customer Care</h3>
-
-          <a href="#">Contact Us</a>
-          <a href="#">Shipping & Delivery</a>
-          <a href="#">Returns & Refunds</a>
-          <a href="#">FAQs</a>
+          <p>
+            Thoughtfully selected products.
+            <br />
+            Made for the way you live.
+          </p>
         </div>
       </div>
 
       <div className="footer__bottom">
-        <p>© 2026 VORA. All rights reserved.</p>
-
-        <div className="footer__legal">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms & Conditions</a>
-        </div>
+        <p>
+          © 2026 VORA. All rights reserved. Designed & Developed by
+          Asmaa Qandil.
+        </p>
 
         <button
           type="button"

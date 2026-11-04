@@ -1,313 +1,278 @@
 
-import { useEffect } from "react";
 import {
-  ArrowDown,
+  ArrowDownRight,
   ArrowUpRight,
-  Compass,
-  Layers3,
-  ShoppingBag,
+  MoveUpRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./About.css";
 
 const images = {
-  hero: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2200&q=90",
+  fashion:
+    "https://images.pexels.com/photos/34150928/pexels-photo-34150928.jpeg?auto=compress&cs=tinysrgb&w=1200",
+
   accessories:
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85",
-  lifestyle:
-    "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=900&q=85",
-  audio:
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",
+    "https://images.pexels.com/photos/33806936/pexels-photo-33806936.jpeg?auto=compress&cs=tinysrgb&w=800",
+
+  headphones:
+    "https://images.pexels.com/photos/844923/pexels-photo-844923.jpeg?auto=compress&cs=tinysrgb&w=800",
+
+  home:
+    "https://images.pexels.com/photos/32922275/pexels-photo-32922275.jpeg?auto=compress&cs=tinysrgb&w=1100",
+
+  outfit:
+    "https://images.pexels.com/photos/3927390/pexels-photo-3927390.jpeg?auto=compress&cs=tinysrgb&w=1000",
+
+  sneakers:
+    "https://images.pexels.com/photos/1456735/pexels-photo-1456735.jpeg?auto=compress&cs=tinysrgb&w=1000",
 };
 
 const categories = [
   {
     number: "01",
-    title: "Everyday essentials",
-    description:
-      "Thoughtful finds that make the little moments feel better.",
-    image: images.accessories,
-    alt: "A minimal wristwatch with a clean modern design",
+    title: "Style & accessories",
+    image: images.outfit,
+    alt: "Clothing and accessories arranged in a flat lay",
   },
   {
     number: "02",
     title: "Home & living",
-    description:
-      "Pieces that bring more personality and comfort into your space.",
-    image: images.lifestyle,
-    alt: "A curated collection of books and lifestyle objects",
+    image: images.home,
+    alt: "Warm minimalist living room",
   },
   {
     number: "03",
-    title: "Tech & more",
-    description:
-      "Useful discoveries that fit naturally into your everyday life.",
-    image: images.audio,
-    alt: "Modern headphones in a simple product composition",
+    title: "Tech & lifestyle",
+    image: images.headphones,
+    alt: "Modern wireless headphones",
   },
 ];
 
-const principles = [
-  {
-    number: "01",
-    title: "Curated, not crowded",
-    description:
-      "We believe finding something you love should feel simple, not overwhelming.",
-    icon: Compass,
-  },
-  {
-    number: "02",
-    title: "Different by design",
-    description:
-      "A mix of categories, ideas, and everyday discoveries in one place.",
-    icon: Layers3,
-  },
-  {
-    number: "03",
-    title: "Made for real life",
-    description:
-      "Useful finds and thoughtful details that belong in your everyday routine.",
-    icon: ShoppingBag,
-  },
-];
-
-export default function About() {
-  useEffect(() => {
-    const elements = document.querySelectorAll("[data-about-reveal]");
-
-    if (!("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-
-    elements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, []);
-
+function About() {
   return (
     <main className="about-page">
-      <section className="about-hero">
-        <img
-          className="about-hero__image"
-          src={images.hero}
-          alt="A thoughtfully arranged modern retail space"
-          fetchPriority="high"
-        />
-
-        <div className="about-hero__shade" />
-
-        <div className="about-hero__top">
-          <span className="about-hero__eyebrow">
-            A little more of what you love
+      {/* Opening */}
+      <section className="about-opening">
+        <div className="about-opening__content">
+          <span className="about-eyebrow">
+            GET TO KNOW VORA
           </span>
-          <span className="about-hero__edition">VORA / OUR STORY</span>
-        </div>
 
-        <div className="about-hero__content">
-          <p className="about-hero__overline">Not just another store.</p>
           <h1>
-            Find your
+            Your world.
             <br />
-            kind of <em>everyday.</em>
+            Your <span>finds.</span>
           </h1>
 
-          <div className="about-hero__bottom">
-            <p>
-              A considered mix of things to use, things to love, and things
-              you didn’t know you were looking for.
-            </p>
+          <p>
+            A place for the things you love, the details
+            that inspire you, and the little finds that make
+            everyday life better.
+          </p>
 
-            <a className="about-hero__scroll" href="#our-story">
-              <span>GET TO KNOW VORA</span>
-              <ArrowDown size={17} strokeWidth={1.6} />
-            </a>
+          <Link to="/shop" className="about-primary-link">
+            Explore the collection
+            <ArrowUpRight size={18} />
+          </Link>
+
+          <div className="about-opening__note">
+            <span className="about-opening__note-line" />
+            <span>MORE TO DISCOVER, EVERY DAY</span>
           </div>
         </div>
 
-        <span className="about-hero__side-note">
-          GOOD FINDS. EVERYDAY MOMENTS.
-        </span>
+        <div className="about-opening__visual">
+          <div className="about-opening__main-image">
+            <img
+              src={images.fashion}
+              alt="Men's fashion and everyday essentials"
+            />
+          </div>
+
+          <div className="about-opening__floating-image about-opening__floating-image--watch">
+            <img
+              src={images.accessories}
+              alt="Accessories in neutral colors"
+            />
+          </div>
+
+          <div className="about-opening__floating-image about-opening__floating-image--tech">
+            <img
+              src={images.headphones}
+              alt="Modern headphones"
+            />
+          </div>
+
+          <div className="about-opening__stamp">
+            <span>VORA</span>
+            <small>THE ART OF FINDING</small>
+          </div>
+
+          <span className="about-opening__visual-number">
+            01 / 04
+          </span>
+        </div>
       </section>
 
-      <section className="about-intro" id="our-story">
-        <div className="about-intro__label" data-about-reveal>
-          <span className="about-section-index">01 / THE IDEA</span>
-          <span className="about-small-line" />
-          <span>WHAT WE BELIEVE</span>
+      {/* Introduction */}
+      <section className="about-introduction">
+        <div className="about-introduction__label">
+          <span>01</span>
+          <span>WHO WE ARE</span>
         </div>
 
-        <div className="about-intro__body" data-about-reveal>
+        <div className="about-introduction__content">
           <h2>
-            Life isn’t one thing.
+            Not one thing.
             <br />
-            <span>Neither should your store be.</span>
+            <span>Many possibilities.</span>
           </h2>
 
-          <div className="about-intro__text">
+          <div className="about-introduction__text">
             <p>
-              The best finds don’t always come from looking for something
-              specific. Sometimes they’re the things you stumble across,
-              instantly connect with, and wonder how you lived without.
+              VORA brings together a considered mix of
+              products across style, home, technology,
+              and everyday essentials.
             </p>
 
             <p>
-              That’s the idea behind VORA: a place to explore different
-              categories, discover useful pieces, and find little things
-              that feel just right for you.
+              We believe great finds are not just about
+              what you buy. They are about how those
+              things fit into your life.
             </p>
-
-            <Link to="/shop" className="about-text-link">
-              Explore the store
-              <ArrowUpRight size={18} strokeWidth={1.7} />
-            </Link>
           </div>
-        </div>
-
-        <div className="about-intro__signature" aria-hidden="true">
-          V.
         </div>
       </section>
 
-      <section className="about-world">
-        <div className="about-world__heading" data-about-reveal>
+      {/* Discover */}
+      <section className="about-discover">
+        <div className="about-section-heading">
           <div>
-            <span className="about-section-index">02 / THE VORA WORLD</span>
+            <span className="about-eyebrow">
+              A WORLD OF CHOICE
+            </span>
+
             <h2>
-              One place.
-              <br />
-              <em>Many discoveries.</em>
+              Find your <span>kind of good.</span>
             </h2>
           </div>
 
           <p>
-            Different interests, different routines, different ways of
-            living. Explore a world of finds, brought together in one place.
+            Different interests. Different needs.
+            One place to explore them all.
           </p>
         </div>
 
-        <div className="about-world__grid">
+        <div className="about-category-grid">
           {categories.map((category) => (
-            <article
-              className="about-category"
+            <Link
+              to="/shop"
+              className="about-category-card"
               key={category.number}
-              data-about-reveal
             >
-              <Link
-                to="/shop"
-                className="about-category__image-link"
-                aria-label={`Explore the store: ${category.title}`}
-              >
+              <div className="about-category-card__image">
                 <img
-                  className="about-category__image"
                   src={category.image}
                   alt={category.alt}
-                  loading="lazy"
                 />
-                <span className="about-category__arrow">
-                  <ArrowUpRight size={20} strokeWidth={1.6} />
-                </span>
-              </Link>
 
-              <div className="about-category__meta">
-                <span>{category.number}</span>
-                <span>DISCOVER MORE</span>
+                <span className="about-category-card__number">
+                  {category.number}
+                </span>
+
+                <span className="about-category-card__arrow">
+                  <ArrowUpRight size={20} />
+                </span>
               </div>
 
-              <h3>{category.title}</h3>
-              <p>{category.description}</p>
-            </article>
+              <div className="about-category-card__footer">
+                <h3>{category.title}</h3>
+                <span>EXPLORE</span>
+              </div>
+            </Link>
           ))}
         </div>
+      </section>
 
-        <div className="about-world__footer" data-about-reveal>
-          <span>And there’s always something new to discover.</span>
-          <Link to="/shop" className="about-text-link">
-            Find your next favorite
-            <ArrowUpRight size={18} strokeWidth={1.7} />
-          </Link>
+      {/* Story */}
+      <section className="about-story">
+        <div className="about-story__image">
+          <img
+            src={images.sneakers}
+            alt="Neutral everyday sneakers"
+          />
+
+          <span className="about-story__image-caption">
+            THE DETAILS MATTER
+          </span>
+        </div>
+
+        <div className="about-story__content">
+          <span className="about-eyebrow">
+            THE VORA POINT OF VIEW
+          </span>
+
+          <h2>
+            The joy is in
+            <br />
+            the <span>discovery.</span>
+          </h2>
+
+          <p>
+            We want exploring to feel simple, inspiring,
+            and worth coming back to. A thoughtful mix
+            of products gives you room to find something
+            that feels just right.
+          </p>
+
+          <div className="about-story__values">
+            <div>
+              <span>01</span>
+              <p>Thoughtful variety</p>
+            </div>
+
+            <div>
+              <span>02</span>
+              <p>Everyday inspiration</p>
+            </div>
+
+            <div>
+              <span>03</span>
+              <p>A simpler way to explore</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="about-manifesto">
-        <div className="about-manifesto__top" data-about-reveal>
-          <span className="about-section-index">03 / OUR APPROACH</span>
-          <span>THE THINKING BEHIND THE FINDS</span>
+      {/* Ending */}
+      <section className="about-ending">
+        <div className="about-ending__top">
+          <span className="about-eyebrow">
+            YOUR NEXT FIND IS WAITING
+          </span>
+
+          <MoveUpRight size={25} />
         </div>
 
-        <div className="about-manifesto__statement" data-about-reveal>
-          <span className="about-manifesto__quote">“</span>
+        <div className="about-ending__content">
           <h2>
-            Good things don’t
+            Come find
             <br />
-            need to be complicated.
+            something <span>good.</span>
           </h2>
-          <p>
-            Just the right mix of choice, character, and things that make
-            everyday life feel a little more yours.
-          </p>
-        </div>
 
-        <div className="about-principles">
-          {principles.map((principle) => {
-            const Icon = principle.icon;
-
-            return (
-              <article
-                className="about-principle"
-                key={principle.number}
-                data-about-reveal
-              >
-                <div className="about-principle__top">
-                  <span>{principle.number}</span>
-                  <Icon size={23} strokeWidth={1.4} />
-                </div>
-
-                <h3>{principle.title}</h3>
-                <p>{principle.description}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="about-cta" data-about-reveal>
-        <div className="about-cta__content">
-          <span className="about-section-index">YOUR NEXT DISCOVERY</span>
-          <h2>
-            There’s more
-            <br />
-            <em>to find.</em>
-          </h2>
-          <p>
-            Take a look around. Your next favorite thing might be closer
-            than you think.
-          </p>
-
-          <Link to="/shop" className="about-cta__button">
+          <Link to="/shop" className="about-ending__link">
             Explore VORA
-            <ArrowUpRight size={19} strokeWidth={1.7} />
+            <ArrowDownRight size={19} />
           </Link>
         </div>
 
-        <div className="about-cta__stamp" aria-hidden="true">
-          <span>VORA</span>
-          <span>FIND YOUR EVERYDAY</span>
-          <span>EST. FOR DISCOVERY</span>
-        </div>
+        <span className="about-ending__wordmark">
+          VORA
+        </span>
       </section>
     </main>
   );
 }
+
+export default About;
